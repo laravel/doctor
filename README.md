@@ -30,9 +30,9 @@ php artisan doctor
 When a failing diagnostic can be fixed, Doctor reports the problem and prompts before applying the fix:
 
 ```text
-Storage is writable: Laravel cannot write to every required storage directory.
+Storage is writable: The application cannot write to every required storage directory.
 
- Would you like Doctor to make Laravel's storage directories writable? (yes/no) [yes]
+ Would you like Doctor to make the storage directories writable? (yes/no) [yes]
 ```
 
 To run available fixes without prompting, pass the `--fix` option:
@@ -183,12 +183,12 @@ class ApplicationKeyIsSet extends Diagnostic implements Fixable
     protected function messages(): array
     {
         return [
-            'configured' => 'Laravel has an application key.',
+            'configured' => 'The application key is configured.',
 
             'missing' => Message::make(
-                summary: 'Laravel does not have an application key.',
+                summary: 'The application key is not configured.',
                 remediation: 'Generate an application key with `php artisan key:generate`.',
-                confirmation: 'Would you like Doctor to generate an application key using `artisan key:generate`?',
+                confirmation: 'Would you like Doctor to generate an application key using `php artisan key:generate`?',
             ),
 
             'generated' => 'The application key was generated.',
@@ -277,7 +277,7 @@ public function boot(): void
 Reports show each diagnostic's source next to its name. The source is the Composer package that provides the diagnostic:
 
 ```text
-[fail] Storage is writable (laravel/doctor): Laravel cannot write to every required storage directory.
+[fail] Storage is writable (laravel/doctor): The application cannot write to every required storage directory.
 [pass] SQLite database exists (acme/application): The SQLite database file exists.
 [warn] Horizon is running (laravel/horizon): Horizon is not currently running.
 ```
