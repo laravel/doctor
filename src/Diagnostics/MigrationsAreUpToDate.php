@@ -28,7 +28,7 @@ class MigrationsAreUpToDate extends Diagnostic
                 summary: 'The migrations table does not exist.',
                 remediation: 'Create the migrations table and run pending migrations.',
             ),
-            'inspection-failed' => 'Laravel could not inspect database migrations.',
+            'inspection-failed' => 'The application could not inspect database migrations.',
             'current' => 'Database migrations are current.',
             'pending' => Message::make(
                 summary: 'Database migrations are pending.',

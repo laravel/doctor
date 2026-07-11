@@ -20,7 +20,7 @@ it('checks the default database connection', function (): void {
 
     expect($result->status->value)->toBe('pass')
         ->and($result->code)->toBe('database-connection-is-reachable.reachable')
-        ->and($result->summary)->toBe('Laravel can connect to the default database connection.');
+        ->and($result->summary)->toBe('The application can connect to the default database connection.');
 });
 
 it('adds a bounded PDO timeout to transient probes', function (): void {

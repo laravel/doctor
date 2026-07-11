@@ -27,10 +27,10 @@ class ConfigurationCanBeCached extends Diagnostic
     {
         return [
             'cannot-cache' => Message::make(
-                summary: 'Laravel configuration cannot be cached.',
+                summary: 'The application configuration cannot be cached.',
                 remediation: 'Remove non-serializable values from configuration files before running `php artisan config:cache`.',
             ),
-            'can-cache' => 'Laravel configuration can be cached.',
+            'can-cache' => 'The application configuration can be cached.',
         ];
     }
 

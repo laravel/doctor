@@ -24,13 +24,13 @@ class FilesystemDisksAreReachable extends Diagnostic
     protected function messages(): array
     {
         return [
-            'not-configured' => 'Laravel does not have a default filesystem disk configured.',
+            'not-configured' => 'The application does not have a default filesystem disk configured.',
             'disk-missing' => 'The default filesystem disk [{disk}] is not configured.',
             'unreachable' => Message::make(
-                summary: 'Laravel cannot reach the default filesystem disk.',
+                summary: 'The application cannot reach the default filesystem disk.',
                 remediation: 'Check filesystem disk roots, credentials, and network access.',
             ),
-            'reachable' => 'Laravel can reach the default filesystem disk.',
+            'reachable' => 'The application can reach the default filesystem disk.',
         ];
     }
 

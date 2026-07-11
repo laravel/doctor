@@ -65,5 +65,5 @@ it('skips when the default queue connection is not configured', function (): voi
     $result = (new QueueConnectionIsAsynchronous)->check();
 
     expect($result->status->value)->toBe('skip')
-        ->and($result->summary)->toBe('Laravel does not have a default queue connection configured.');
+        ->and($result->summary)->toBe('The application does not have a default queue connection configured.');
 });

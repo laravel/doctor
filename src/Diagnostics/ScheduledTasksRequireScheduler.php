@@ -9,7 +9,7 @@ use Laravel\Doctor\Results\Message;
 
 class ScheduledTasksRequireScheduler extends Diagnostic
 {
-    public string $name = 'Scheduled tasks require scheduler';
+    public string $name = 'Scheduled tasks registered';
 
     public string $group = 'scheduler';
 
@@ -21,9 +21,9 @@ class ScheduledTasksRequireScheduler extends Diagnostic
     protected function messages(): array
     {
         return [
-            'no-tasks' => 'Laravel does not have scheduled tasks.',
+            'no-tasks' => 'The application does not have scheduled tasks.',
             'tasks-registered' => Message::make(
-                summary: 'Laravel has scheduled tasks.',
+                summary: 'The application has scheduled tasks.',
                 remediation: 'Make sure the scheduler is running with `php artisan schedule:run` every minute or `php artisan schedule:work` during development.',
             ),
         ];

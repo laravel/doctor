@@ -24,13 +24,13 @@ class StorageIsWritable extends Diagnostic implements Fixable
     protected function messages(): array
     {
         return [
-            'writable' => 'Laravel storage directories are writable.',
+            'writable' => 'The application storage directories are writable.',
             'not-writable' => Message::make(
-                summary: 'Laravel cannot write to every required storage directory.',
+                summary: 'The application cannot write to every required storage directory.',
                 remediation: 'Ensure storage directories and bootstrap/cache exist and are writable by the PHP process.',
-                confirmation: 'Would you like Doctor to make Laravel\'s storage directories writable?',
+                confirmation: 'Would you like Doctor to make the storage directories writable?',
             ),
-            'still-not-writable' => 'Some Laravel storage directories are still not writable.',
+            'still-not-writable' => 'Some storage directories are still not writable.',
         ];
     }
 

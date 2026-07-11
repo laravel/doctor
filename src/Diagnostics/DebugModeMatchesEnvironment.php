@@ -22,10 +22,10 @@ class DebugModeMatchesEnvironment extends Diagnostic
     {
         return [
             'enabled-in-production' => Message::make(
-                summary: 'Laravel debug mode is enabled in production.',
+                summary: 'Debug mode is enabled in production.',
                 remediation: 'Set APP_DEBUG=false in production.',
             ),
-            'matches' => 'Laravel debug mode matches the application environment.',
+            'matches' => 'Debug mode matches the application environment.',
         ];
     }
 

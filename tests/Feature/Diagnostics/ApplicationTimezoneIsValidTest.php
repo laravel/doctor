@@ -9,7 +9,7 @@ it('reports a missing application timezone', function (): void {
 
     expect($result->status->value)->toBe('fail')
         ->and($result->code)->toBe('application-timezone-is-valid.missing')
-        ->and($result->summary)->toBe('Laravel does not have an application timezone configured.');
+        ->and($result->summary)->toBe('The application does not have a timezone configured.');
 });
 
 it('reports an invalid application timezone', function (): void {

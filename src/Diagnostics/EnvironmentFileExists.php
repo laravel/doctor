@@ -23,13 +23,13 @@ class EnvironmentFileExists extends Diagnostic implements Fixable
     protected function messages(): array
     {
         return [
-            'exists' => 'Laravel has an environment file.',
+            'exists' => 'The application has an environment file.',
             'missing' => Message::make(
-                summary: 'Laravel does not have an environment file.',
+                summary: 'The application does not have an environment file.',
                 confirmation: 'Would you like Doctor to copy .env.example to .env?',
             ),
             'missing-with-example' => Message::make(
-                summary: 'Laravel does not have an environment file.',
+                summary: 'The application does not have an environment file.',
                 remediation: 'Copy the example environment file to .env, then review its values.',
                 confirmation: 'Would you like Doctor to copy .env.example to .env?',
             ),

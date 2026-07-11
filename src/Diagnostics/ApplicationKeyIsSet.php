@@ -24,11 +24,11 @@ class ApplicationKeyIsSet extends Diagnostic implements Fixable
     protected function messages(): array
     {
         return [
-            'configured' => 'Laravel has an application key.',
+            'configured' => 'The application key is configured.',
             'missing' => Message::make(
-                summary: 'Laravel does not have an application key.',
+                summary: 'The application key is not configured.',
                 remediation: 'Generate an application key with `php artisan key:generate`.',
-                confirmation: 'Would you like Doctor to generate an application key using `artisan key:generate`?',
+                confirmation: 'Would you like Doctor to generate an application key using `php artisan key:generate`?',
             ),
             'generated' => 'The application key was generated.',
             'generation-failed' => 'The application key could not be generated.',

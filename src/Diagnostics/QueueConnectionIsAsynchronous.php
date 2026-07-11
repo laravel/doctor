@@ -21,7 +21,7 @@ class QueueConnectionIsAsynchronous extends Diagnostic
     protected function messages(): array
     {
         return [
-            'not-configured' => 'Laravel does not have a default queue connection configured.',
+            'not-configured' => 'The application does not have a default queue connection configured.',
             'sync-production' => Message::make(
                 summary: 'Queued jobs run synchronously in production.',
                 remediation: 'Set QUEUE_CONNECTION to a background queue driver such as database, redis, sqs, or beanstalkd.',

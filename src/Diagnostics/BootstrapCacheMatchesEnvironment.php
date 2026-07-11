@@ -23,11 +23,11 @@ class BootstrapCacheMatchesEnvironment extends Diagnostic
     {
         return [
             'uncached-production' => Message::make(
-                summary: 'Laravel bootstrap files are not cached.',
+                summary: 'The application bootstrap files are not cached.',
                 remediation: 'Run `php artisan optimize` or `php artisan config:cache` during deployment.',
             ),
-            'uncached-local' => 'Laravel bootstrap files are not cached.',
-            'cached-production' => 'Laravel bootstrap files are cached.',
+            'uncached-local' => 'The application bootstrap files are not cached.',
+            'cached-production' => 'The application bootstrap files are cached.',
             'cached-local' => Message::make(
                 summary: 'Cached bootstrap {files} detected: {cached}.',
                 remediation: 'If recent changes are not appearing, run `php artisan optimize:clear`.',

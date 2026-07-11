@@ -30,7 +30,7 @@ class PublicStorageLinkExists extends Diagnostic implements Fixable
             'missing' => Message::make(
                 summary: 'The public storage link does not exist.',
                 remediation: 'Create the public storage link with `php artisan storage:link`.',
-                confirmation: 'Would you like Doctor to create the public storage link using `artisan storage:link`?',
+                confirmation: 'Would you like Doctor to create the public storage link using `php artisan storage:link`?',
             ),
             'creation-failed' => 'The public storage link could not be created.',
             'created' => 'The public storage link was created.',

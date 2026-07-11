@@ -23,12 +23,12 @@ class CacheStoreIsReachable extends Diagnostic
     protected function messages(): array
     {
         return [
-            'not-configured' => 'Laravel does not have a default cache store configured.',
+            'not-configured' => 'The application does not have a default cache store configured.',
             'unreachable' => Message::make(
-                summary: 'Laravel cannot reach the default cache store.',
+                summary: 'The application cannot reach the default cache store.',
                 remediation: 'Check CACHE_STORE and the backing cache service configuration.',
             ),
-            'reachable' => 'Laravel can reach the default cache store.',
+            'reachable' => 'The application can reach the default cache store.',
         ];
     }
 

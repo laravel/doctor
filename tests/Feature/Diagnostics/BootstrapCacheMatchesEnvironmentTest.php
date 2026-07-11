@@ -23,7 +23,7 @@ it('passes when bootstrap files are not cached locally', function (): void {
     $result = (new BootstrapCacheMatchesEnvironment)->check();
 
     expect($result->status->value)->toBe('pass')
-        ->and($result->summary)->toBe('Laravel bootstrap files are not cached.');
+        ->and($result->summary)->toBe('The application bootstrap files are not cached.');
 });
 
 it('warns when bootstrap files are not cached outside local environments', function (): void {
@@ -37,7 +37,7 @@ it('warns when bootstrap files are not cached outside local environments', funct
     $result = (new BootstrapCacheMatchesEnvironment)->check();
 
     expect($result->status->value)->toBe('warn')
-        ->and($result->summary)->toBe('Laravel bootstrap files are not cached.');
+        ->and($result->summary)->toBe('The application bootstrap files are not cached.');
 });
 
 it('notices when bootstrap files are cached locally', function (): void {
@@ -92,5 +92,5 @@ it('passes when bootstrap files are cached outside local environments', function
     $result = (new BootstrapCacheMatchesEnvironment)->check();
 
     expect($result->status->value)->toBe('pass')
-        ->and($result->summary)->toBe('Laravel bootstrap files are cached.');
+        ->and($result->summary)->toBe('The application bootstrap files are cached.');
 });

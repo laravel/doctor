@@ -21,10 +21,10 @@ class ApplicationTimezoneIsValid extends Diagnostic
     {
         return [
             'missing' => Message::make(
-                summary: 'Laravel does not have an application timezone configured.',
+                summary: 'The application does not have a timezone configured.',
                 remediation: 'Set APP_TIMEZONE or app.timezone to a valid PHP timezone.',
             ),
-            'valid' => 'Laravel has a valid application timezone.',
+            'valid' => 'The application has a valid timezone.',
             'invalid' => Message::make(
                 summary: 'The application timezone [{timezone}] is not a valid PHP timezone.',
                 remediation: 'Set app.timezone to one of PHP\'s supported timezone identifiers.',

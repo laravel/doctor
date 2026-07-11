@@ -25,7 +25,7 @@ it('passes when the application key is set', function (): void {
     $outcome = $report->diagnostics()[0];
 
     expect($outcome->result->status->value)->toBe('pass')
-        ->and($outcome->result->summary)->toBe('Laravel has an application key.');
+        ->and($outcome->result->summary)->toBe('The application key is configured.');
 });
 
 it('reports a missing application key', function (): void {
@@ -38,8 +38,8 @@ it('reports a missing application key', function (): void {
 
     expect($outcome->result->status->value)->toBe('fail')
         ->and($outcome->result->code)->toBe('application-key-is-set.missing')
-        ->and($outcome->result->summary)->toBe('Laravel does not have an application key.')
-        ->and($outcome->result->confirmation)->toBe('Would you like Doctor to generate an application key using `artisan key:generate`?')
+        ->and($outcome->result->summary)->toBe('The application key is not configured.')
+        ->and($outcome->result->confirmation)->toBe('Would you like Doctor to generate an application key using `php artisan key:generate`?')
         ->and($outcome->result->remediation)->toBe('Generate an application key with `php artisan key:generate`.');
 });
 
@@ -52,7 +52,7 @@ it('generates an application key when fixed', function (): void {
 
     $fix = $this->app->make(Doctor::class)->fix(new DiagnosticOutcome(
         new ApplicationKeyIsSet,
-        DiagnosticResult::fail('Laravel does not have an application key.'),
+        DiagnosticResult::fail('The application key is not configured.'),
     ));
 
     expect($fix->result->status->value)->toBe('pass')
@@ -71,7 +71,7 @@ it('reports when the environment file has no APP_KEY variable', function (): voi
 
     $fix = $this->app->make(Doctor::class)->fix(new DiagnosticOutcome(
         new ApplicationKeyIsSet,
-        DiagnosticResult::fail('Laravel does not have an application key.'),
+        DiagnosticResult::fail('The application key is not configured.'),
     ));
 
     expect($fix->result->status->value)->toBe('fail')
@@ -89,7 +89,7 @@ it('reports when the application key cannot be written to the environment file',
 
     $fix = $this->app->make(Doctor::class)->fix(new DiagnosticOutcome(
         new ApplicationKeyIsSet,
-        DiagnosticResult::fail('Laravel does not have an application key.'),
+        DiagnosticResult::fail('The application key is not configured.'),
     ));
 
     expect($fix->result->status->value)->toBe('fail')

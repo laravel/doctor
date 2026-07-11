@@ -24,12 +24,12 @@ class RedisConnectionsAreReachable extends Diagnostic
     protected function messages(): array
     {
         return [
-            'not-configured' => 'Laravel is not using Redis-backed cache, queue, or session storage.',
+            'not-configured' => 'The application is not using Redis-backed cache, queue, or session storage.',
             'unreachable' => Message::make(
-                summary: 'Laravel cannot reach every active Redis connection.',
+                summary: 'The application cannot reach every active Redis connection.',
                 remediation: 'Check Redis host, port, credentials, and client configuration.',
             ),
-            'reachable' => 'Laravel can reach every active Redis connection.',
+            'reachable' => 'The application can reach every active Redis connection.',
         ];
     }
 

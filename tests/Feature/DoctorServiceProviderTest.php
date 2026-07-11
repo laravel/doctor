@@ -158,7 +158,7 @@ it('renders issue callout sources with package footer', function (): void {
     ], $output);
 
     expect($output->fetch())
-        ->toContain('Laravel does not have an application key.')
+        ->toContain('The application key is not configured.')
         ->toContain('Suggested fix')
         ->toContain('Generate an application key with')
         ->toContain('php artisan key:generate')

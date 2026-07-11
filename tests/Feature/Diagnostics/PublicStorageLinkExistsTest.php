@@ -38,7 +38,7 @@ it('reports a missing public storage link and can fix it', function (): void {
         && $process->path === $basePath);
 
     expect($result->status->value)->toBe('fail')
-        ->and($result->confirmation)->toBe('Would you like Doctor to create the public storage link using `artisan storage:link`?')
+        ->and($result->confirmation)->toBe('Would you like Doctor to create the public storage link using `php artisan storage:link`?')
         ->and($result->remediation)->toBe('Create the public storage link with `php artisan storage:link`.')
         ->and($fix->status->value)->toBe('pass');
 });

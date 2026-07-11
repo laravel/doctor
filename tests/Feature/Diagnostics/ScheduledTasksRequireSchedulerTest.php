@@ -9,7 +9,7 @@ it('passes when no scheduled tasks are registered', function (): void {
     $result = (new ScheduledTasksRequireScheduler)->check();
 
     expect($result->status->value)->toBe('pass')
-        ->and($result->summary)->toBe('Laravel does not have scheduled tasks.');
+        ->and($result->summary)->toBe('The application does not have scheduled tasks.');
 });
 
 it('notices when scheduled tasks are registered', function (): void {
@@ -21,6 +21,6 @@ it('notices when scheduled tasks are registered', function (): void {
     $result = (new ScheduledTasksRequireScheduler)->check();
 
     expect($result->status->value)->toBe('notice')
-        ->and($result->summary)->toBe('Laravel has scheduled tasks.')
+        ->and($result->summary)->toBe('The application has scheduled tasks.')
         ->and($result->remediation)->toContain('php artisan schedule:run');
 });

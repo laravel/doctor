@@ -9,7 +9,7 @@ it('reports debug mode in production', function (): void {
     $result = (new DebugModeMatchesEnvironment)->check();
 
     expect($result->status->value)->toBe('fail')
-        ->and($result->summary)->toBe('Laravel debug mode is enabled in production.');
+        ->and($result->summary)->toBe('Debug mode is enabled in production.');
 });
 
 it('treats unmapped environments as production', function (): void {
@@ -19,7 +19,7 @@ it('treats unmapped environments as production', function (): void {
     $result = (new DebugModeMatchesEnvironment)->check();
 
     expect($result->status->value)->toBe('fail')
-        ->and($result->summary)->toBe('Laravel debug mode is enabled in production.');
+        ->and($result->summary)->toBe('Debug mode is enabled in production.');
 });
 
 it('honors custom local environment mappings', function (): void {
@@ -32,5 +32,5 @@ it('honors custom local environment mappings', function (): void {
     $result = (new DebugModeMatchesEnvironment)->check();
 
     expect($result->status->value)->toBe('pass')
-        ->and($result->summary)->toBe('Laravel debug mode matches the application environment.');
+        ->and($result->summary)->toBe('Debug mode matches the application environment.');
 });

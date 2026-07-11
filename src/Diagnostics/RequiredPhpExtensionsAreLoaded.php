@@ -9,7 +9,7 @@ use Laravel\Doctor\Support\ComposerJson;
 
 class RequiredPhpExtensionsAreLoaded extends Diagnostic
 {
-    public string $name = 'Required PHP extensions are loaded';
+    public string $name = 'Required PHP extensions loaded';
 
     public string $group = 'environment';
 

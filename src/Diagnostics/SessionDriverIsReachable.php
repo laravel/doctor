@@ -27,12 +27,12 @@ class SessionDriverIsReachable extends Diagnostic
     protected function messages(): array
     {
         return [
-            'not-configured' => 'Laravel does not have a session driver configured.',
+            'not-configured' => 'The application does not have a default session driver configured.',
             'unreachable' => Message::make(
-                summary: 'Laravel cannot reach the configured session driver.',
+                summary: 'The application cannot reach the default session driver.',
                 remediation: 'Check SESSION_DRIVER and the backing session store configuration.',
             ),
-            'reachable' => 'Laravel can reach the configured session driver.',
+            'reachable' => 'The application can reach the default session driver.',
         ];
     }
 

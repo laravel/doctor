@@ -27,13 +27,13 @@ class DatabaseConnectionIsReachable extends Diagnostic
     protected function messages(): array
     {
         return [
-            'not-configured' => 'Laravel does not have a default database connection configured.',
+            'not-configured' => 'The application does not have a default database connection configured.',
             'connection-missing' => 'The default database connection [{connection}] is not configured.',
             'unreachable' => Message::make(
-                summary: 'Laravel cannot connect to the default database connection.',
+                summary: 'The application cannot connect to the default database connection.',
                 remediation: 'Check DB_CONNECTION and the database credentials in your environment file.',
             ),
-            'reachable' => 'Laravel can connect to the default database connection.',
+            'reachable' => 'The application can connect to the default database connection.',
         ];
     }
 

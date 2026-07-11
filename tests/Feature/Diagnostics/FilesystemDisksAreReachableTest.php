@@ -32,7 +32,7 @@ it('passes when the default local filesystem disk is reachable', function (): vo
     $result = (new FilesystemDisksAreReachable)->check();
 
     expect($result->status->value)->toBe('pass')
-        ->and($result->summary)->toBe('Laravel can reach the default filesystem disk.');
+        ->and($result->summary)->toBe('The application can reach the default filesystem disk.');
 });
 
 it('skips when the default filesystem disk is not configured', function (): void {

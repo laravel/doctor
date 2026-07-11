@@ -27,7 +27,7 @@ it('passes when .env exists', function (): void {
     $outcome = $report->diagnostics()[0];
 
     expect($outcome->result->status->value)->toBe('pass')
-        ->and($outcome->result->summary)->toBe('Laravel has an environment file.');
+        ->and($outcome->result->summary)->toBe('The application has an environment file.');
 });
 
 it('passes when an environment-specific file exists', function (): void {
@@ -54,7 +54,7 @@ it('reports a missing environment file with guidance when an example exists', fu
     $outcome = $report->diagnostics()[0];
 
     expect($outcome->result->status->value)->toBe('fail')
-        ->and($outcome->result->summary)->toBe('Laravel does not have an environment file.')
+        ->and($outcome->result->summary)->toBe('The application does not have an environment file.')
         ->and($outcome->result->confirmation)->toBe('Would you like Doctor to copy .env.example to .env?')
         ->and($outcome->result->remediation)->toBe('Copy the example environment file to .env, then review its values.');
 });
@@ -67,7 +67,7 @@ it('copies .env.example to .env when fixed', function (): void {
 
     $fix = $this->app->make(Doctor::class)->fix(new DiagnosticOutcome(
         new EnvironmentFileExists,
-        DiagnosticResult::fail('Laravel does not have an environment file.'),
+        DiagnosticResult::fail('The application does not have an environment file.'),
     ));
 
     expect($fix->result->status->value)->toBe('pass')
@@ -84,7 +84,7 @@ it('does not overwrite an existing .env when fixed', function (): void {
 
     $fix = $this->app->make(Doctor::class)->fix(new DiagnosticOutcome(
         new EnvironmentFileExists,
-        DiagnosticResult::fail('Laravel does not have an environment file.'),
+        DiagnosticResult::fail('The application does not have an environment file.'),
     ));
 
     expect($fix->result->status->value)->toBe('pass')
@@ -98,7 +98,7 @@ it('fails the fix when .env.example is missing', function (): void {
 
     $fix = $this->app->make(Doctor::class)->fix(new DiagnosticOutcome(
         new EnvironmentFileExists,
-        DiagnosticResult::fail('Laravel does not have an environment file.'),
+        DiagnosticResult::fail('The application does not have an environment file.'),
     ));
 
     expect($fix->result->status->value)->toBe('fail')

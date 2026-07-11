@@ -27,12 +27,12 @@ class QueueConnectionIsReachable extends Diagnostic
     protected function messages(): array
     {
         return [
-            'not-configured' => 'Laravel does not have a default queue connection configured.',
+            'not-configured' => 'The application does not have a default queue connection configured.',
             'unreachable' => Message::make(
-                summary: 'Laravel cannot reach the default queue connection.',
+                summary: 'The application cannot reach the default queue connection.',
                 remediation: 'Check QUEUE_CONNECTION and the backing queue service configuration.',
             ),
-            'reachable' => 'Laravel can reach the default queue connection.',
+            'reachable' => 'The application can reach the default queue connection.',
         ];
     }
 
