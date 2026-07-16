@@ -22,7 +22,7 @@
         "illuminate/contracts": "^12.0|^13.0",
         "illuminate/process": "^12.0|^13.0",
         "illuminate/support": "^12.0|^13.0",
-        "laravel/agent-detector": "^2.0",
+        "laravel/agent-detector": "^2.0.1",
         "laravel/prompts": "^0.3.21"
     },
     "require-dev": {
