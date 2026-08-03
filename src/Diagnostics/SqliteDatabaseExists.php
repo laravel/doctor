@@ -54,7 +54,7 @@ class SqliteDatabaseExists extends Diagnostic implements Fixable
             return $this->skip('not-file');
         }
 
-        if (! str_starts_with($database, DIRECTORY_SEPARATOR)) {
+        if (! $this->isAbsolutePath($database)) {
             $database = base_path($database);
         }
 
@@ -87,5 +87,12 @@ class SqliteDatabaseExists extends Diagnostic implements Fixable
         }
 
         return $this->fixed('created');
+    }
+
+    private function isAbsolutePath(string $path): bool
+    {
+        return str_starts_with($path, '/')
+            || str_starts_with($path, '\\')
+            || preg_match('/^[a-zA-Z]:[\\\\\/]/', $path) === 1;
     }
 }
