@@ -93,7 +93,7 @@ class PublicStorageLinkExists extends Diagnostic implements Fixable
 
     private function publicStoragePath(): string
     {
-        return base_path('public/storage');
+        return public_path('storage');
     }
 
     private function publicDiskIsUnused(): bool

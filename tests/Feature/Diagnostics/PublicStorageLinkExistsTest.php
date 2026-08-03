@@ -45,6 +45,28 @@ it('reports a missing public storage link and can fix it', function (): void {
         ->and($fix->status->value)->toBe('pass');
 });
 
+it('uses the configured public path when checking the storage link', function (): void {
+    $basePath = doctor_public_storage_link_base_path();
+    $publicPath = $basePath.'/web';
+
+    mkdir($basePath.'/storage/app/public', 0775, true);
+    mkdir($publicPath, 0775, true);
+    touch($basePath.'/storage/app/public/avatar.jpg');
+    symlink($basePath.'/storage/app/public', $publicPath.'/storage');
+
+    $this->app->setBasePath($basePath);
+    $this->app->usePublicPath($publicPath);
+    config(['filesystems.disks.public' => [
+        'driver' => 'local',
+        'root' => $basePath.'/storage/app/public',
+    ]]);
+
+    $result = (new PublicStorageLinkExists)->check();
+
+    expect($result->status->value)->toBe('pass')
+        ->and($result->summary)->toBe('The public storage link exists.');
+});
+
 it('skips when public storage only contains a gitignore placeholder', function (): void {
     $basePath = doctor_public_storage_link_base_path();
     mkdir($basePath.'/storage/app/public', 0775, true);
