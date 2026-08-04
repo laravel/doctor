@@ -29,6 +29,22 @@ it('passes when the sqlite database file exists', function (): void {
         ->and($result->context['database'])->toBe($basePath.'/database/database.sqlite');
 });
 
+it('preserves an absolute Windows sqlite database path', function (string $database): void {
+    $this->app->setBasePath(doctor_sqlite_database_base_path());
+    config([
+        'database.default' => 'sqlite',
+        'database.connections.sqlite.database' => $database,
+    ]);
+
+    $result = (new SqliteDatabaseExists)->check();
+
+    expect($result->status->value)->toBe('fail')
+        ->and($result->context['database'])->toBe($database);
+})->with([
+    'backslash separators' => 'C:\\Users\\MyUser\\Herd\\my-project\\database\\database.sqlite',
+    'forward slash separators' => 'C:/Users/MyUser/Herd/my-project/database/database.sqlite',
+]);
+
 it('reports a missing sqlite database file and carries the path to the fix', function (): void {
     $basePath = doctor_sqlite_database_base_path();
 
