@@ -3,6 +3,7 @@
 namespace Laravel\Doctor\Console;
 
 use Closure;
+use DateTimeZone;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Config\Repository;
 use Laravel\AgentDetector\AgentDetector;
@@ -79,7 +80,7 @@ class DoctorCommand extends Command
     {
         $timezone = $config->get('app.timezone');
 
-        if (is_string($timezone) && in_array($timezone, timezone_identifiers_list(), true)) {
+        if (is_string($timezone) && in_array($timezone, timezone_identifiers_list(DateTimeZone::ALL_WITH_BC), true)) {
             return;
         }
 
