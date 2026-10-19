@@ -16,7 +16,7 @@ Each diagnostic is a single check. It inspects one thing, such as whether Larave
 Install Laravel Doctor using Composer:
 
 ```bash
-composer require laravel/doctor --dev
+composer require laravel/doctor
 ```
 
 ## Running Doctor
