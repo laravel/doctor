@@ -509,6 +509,36 @@ it('requires progress observers to continue runner-owned execution', function ()
         ->run();
 })->throws(LogicException::class, 'must invoke its continuation');
 
+it('allows applied fixes to be observed', function (): void {
+    $observed = [];
+
+    $report = (new Doctor($this->app))
+        ->diagnostic(FixableDiagnostic::class)
+        ->fixUsing(fn (DiagnosticOutcome $outcome): bool => true)
+        ->observeFixesUsing(function (DiagnosticOutcome $outcome, Closure $apply) use (&$observed): void {
+            $observed[] = 'fixing:'.class_basename($outcome->diagnostic);
+
+            $observed[] = 'fixed:'.$apply()->result->status->value;
+        })
+        ->run();
+
+    expect($report->fixes())->toHaveCount(1)
+        ->and($observed)->toBe([
+            'fixing:FixableDiagnostic',
+            'fixed:pass',
+        ]);
+});
+
+it('requires fix observers to apply the fix', function (): void {
+    (new Doctor($this->app))
+        ->diagnostic(FixableDiagnostic::class)
+        ->fixUsing(fn (DiagnosticOutcome $outcome): bool => true)
+        ->observeFixesUsing(function (DiagnosticOutcome $outcome, Closure $apply): void {
+            // Intentionally do not apply the fix.
+        })
+        ->run();
+})->throws(LogicException::class, 'must invoke its continuation');
+
 it('appends fixes to an existing diagnostic report', function (): void {
     $diagnostic = new PassingDiagnostic;
     $first = new DiagnosticFixOutcome($diagnostic, FixResult::pass('The first fix passed.'));

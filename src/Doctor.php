@@ -17,6 +17,7 @@ use Throwable;
 
 /**
  * @phpstan-import-type GroupContinuation from PendingRun
+ * @phpstan-import-type FixContinuation from PendingRun
  */
 class Doctor
 {
@@ -136,6 +137,16 @@ class Doctor
     public function fixUsing(Closure $callback): PendingRun
     {
         return $this->pendingRun()->fixUsing($callback);
+    }
+
+    /**
+     * Begin a run that observes each applied fix through the given callback.
+     *
+     * @param  Closure(DiagnosticOutcome, FixContinuation): void  $callback
+     */
+    public function observeFixesUsing(Closure $callback): PendingRun
+    {
+        return $this->pendingRun()->observeFixesUsing($callback);
     }
 
     /**

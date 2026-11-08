@@ -13,6 +13,7 @@ use LogicException;
  * @phpstan-type BeforeDiagnostic Closure(Diagnostic): void
  * @phpstan-type AfterDiagnostic Closure(DiagnosticOutcome): void
  * @phpstan-type GroupContinuation Closure(BeforeDiagnostic|null $before, AfterDiagnostic|null $after): void
+ * @phpstan-type FixContinuation Closure(): DiagnosticFixOutcome
  */
 class PendingRun
 {
@@ -31,6 +32,13 @@ class PendingRun
      * @var (Closure(DiagnosticOutcome): (bool|string))|null
      */
     protected ?Closure $fix = null;
+
+    /**
+     * The callback used to observe each applied fix.
+     *
+     * @var (Closure(DiagnosticOutcome, FixContinuation): void)|null
+     */
+    protected ?Closure $fixObserver = null;
 
     /**
      * The callback invoked when applied fixes require the diagnostics to be re-run.
@@ -116,6 +124,21 @@ class PendingRun
     public function fixUsing(Closure $callback): self
     {
         $this->fix = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Observe each applied fix through the given callback.
+     *
+     * The callback receives the failing outcome and a continuation that
+     * applies the fix and returns its outcome. It must invoke the continuation.
+     *
+     * @param  Closure(DiagnosticOutcome, FixContinuation): void  $callback
+     */
+    public function observeFixesUsing(Closure $callback): self
+    {
+        $this->fixObserver = $callback;
 
         return $this;
     }
@@ -243,6 +266,24 @@ class PendingRun
     }
 
     /**
+     * Apply a diagnostic fix while allowing it to be observed.
+     */
+    protected function applyFix(DiagnosticOutcome $outcome, ?string $option): DiagnosticFixOutcome
+    {
+        if ($this->fixObserver === null) {
+            return $this->doctor->fix($outcome, $option);
+        }
+
+        $fix = null;
+
+        ($this->fixObserver)($outcome, function () use (&$fix, $outcome, $option): DiagnosticFixOutcome {
+            return $fix = $this->doctor->fix($outcome, $option);
+        });
+
+        return $fix ?? throw new LogicException('A fix observer must invoke its continuation.');
+    }
+
+    /**
      * Apply the approved fixes for the report's failing diagnostics.
      *
      * @param  Closure(DiagnosticOutcome): (bool|string)  $fix
@@ -263,7 +304,7 @@ class PendingRun
                 continue;
             }
 
-            $fixes[] = $this->doctor->fix($outcome, is_string($decision) ? $decision : null);
+            $fixes[] = $this->applyFix($outcome, is_string($decision) ? $decision : null);
         }
 
         return $fixes;

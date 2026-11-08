@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Laravel\Doctor\PendingRun bail(bool $bail = true)
  * @method static \Laravel\Doctor\PendingRun observeUsing(\Closure $callback)
  * @method static \Laravel\Doctor\PendingRun fixUsing(\Closure $callback)
+ * @method static \Laravel\Doctor\PendingRun observeFixesUsing(\Closure $callback)
  * @method static \Laravel\Doctor\PendingRun beforeRerun(\Closure $callback)
  *
  * @see \Laravel\Doctor\Doctor
