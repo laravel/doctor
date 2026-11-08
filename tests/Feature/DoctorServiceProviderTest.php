@@ -48,6 +48,7 @@ use Laravel\Doctor\Tests\Fixtures\Diagnostics\PassingDiagnostic;
 use Laravel\Doctor\Tests\Fixtures\Diagnostics\SharedStateWasFixedDiagnostic;
 use Laravel\Doctor\Tests\Fixtures\Diagnostics\WarningDiagnostic;
 use Laravel\Prompts\Elements\Element;
+use Laravel\Prompts\Prompt;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -237,6 +238,70 @@ it('formats interactive fix callouts without remediation or confirmation text', 
     expect($renderer->content($outcome))->toBe(['The diagnostic failed.'])
         ->and($command->prompt($outcome))->toBe('Fix the testing diagnostic?')
         ->and($command->prompt($outcomeWithoutConfirmation))->toBe('Fix "Testing diagnostic is fixable"?');
+});
+
+it('shows a spinner while a fix is applied', function (): void {
+    $output = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, false);
+
+    $command = new class extends DoctorCommand
+    {
+        public function observer(): Closure
+        {
+            return $this->fixObserver();
+        }
+    };
+
+    $style = new OutputStyle(new ArrayInput([]), $output);
+
+    $command->setLaravel($this->app);
+    $command->setInput(new ArrayInput([]));
+    $command->setOutput($style);
+
+    Prompt::setOutput($style);
+
+    $outcome = new DiagnosticOutcome(new FixableDiagnostic, (new FixableDiagnostic)->check());
+    $applied = false;
+
+    $command->observer()($outcome, function () use (&$applied): DiagnosticFixOutcome {
+        $applied = true;
+
+        return new DiagnosticFixOutcome(new FixableDiagnostic, FixResult::pass('The testing diagnostic was fixed.'));
+    });
+
+    expect($applied)->toBeTrue()
+        ->and($output->fetch())->toContain('Fixing "Testing diagnostic is fixable"...');
+});
+
+it('restores the prompts output before the fix spinner erases itself', function (): void {
+    $output = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, false);
+    $nestedOutput = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, false);
+
+    $command = new class extends DoctorCommand
+    {
+        public function observer(): Closure
+        {
+            return $this->fixObserver();
+        }
+    };
+
+    $style = new OutputStyle(new ArrayInput([]), $output);
+
+    $command->setLaravel($this->app);
+    $command->setInput(new ArrayInput([]));
+    $command->setOutput($style);
+
+    Prompt::setOutput($style);
+
+    $outcome = new DiagnosticOutcome(new FixableDiagnostic, (new FixableDiagnostic)->check());
+
+    $command->observer()($outcome, function () use ($nestedOutput): DiagnosticFixOutcome {
+        // Nested Artisan commands re-bind the prompts output like this.
+        Prompt::setOutput($nestedOutput);
+
+        return new DiagnosticFixOutcome(new FixableDiagnostic, FixResult::pass('The testing diagnostic was fixed.'));
+    });
+
+    expect($nestedOutput->fetch())->toBe('');
 });
 
 it('renders issue details under a heading distinct from the suggested fix', function (): void {
