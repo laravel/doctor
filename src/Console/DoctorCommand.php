@@ -20,11 +20,13 @@ use Laravel\Prompts\Support\Logger;
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\select;
+use function Laravel\Prompts\spin;
 use function Laravel\Prompts\task;
 use function Laravel\Prompts\warning;
 
 /**
  * @phpstan-import-type GroupContinuation from PendingRun
+ * @phpstan-import-type FixContinuation from PendingRun
  */
 class DoctorCommand extends Command
 {
@@ -152,7 +154,9 @@ class DoctorCommand extends Command
     protected function runCli(Doctor $doctor, string $failOn): int
     {
         $report = $this->runner($doctor)
-            ->when($this->shouldUseTasks(), fn (PendingRun $runner) => $runner->observeUsing($this->taskObserver()))
+            ->when($this->shouldUseTasks(), fn (PendingRun $runner) => $runner
+                ->observeUsing($this->taskObserver())
+                ->observeFixesUsing($this->fixObserver()))
             ->fixUsing(fn (DiagnosticOutcome $outcome): bool|string => $this->fixDecision($outcome))
             ->beforeRerun(function (): void {
                 $this->restorePrompts();
@@ -267,6 +271,28 @@ class DoctorCommand extends Command
                 limit: 0,
                 keepSummary: true,
                 callback: fn (Logger $logger) => $this->observeGroupTask($next, $logger),
+            );
+        };
+    }
+
+    /**
+     * Get the callback that shows a spinner while each fix is applied.
+     *
+     * @return Closure(DiagnosticOutcome, FixContinuation): void
+     */
+    protected function fixObserver(): Closure
+    {
+        return function (DiagnosticOutcome $outcome, Closure $apply): void {
+            spin(
+                callback: function () use ($apply): void {
+                    try {
+                        $apply();
+                    } finally {
+                        // Restore before the spinner erases itself, so it erases from Doctor's output.
+                        $this->restorePrompts();
+                    }
+                },
+                message: sprintf('Fixing "%s"...', $outcome->diagnostic->name),
             );
         };
     }
