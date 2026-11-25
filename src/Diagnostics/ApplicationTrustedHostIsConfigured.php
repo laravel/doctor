@@ -124,8 +124,7 @@ class ApplicationTrustedHostIsConfigured extends Diagnostic
 
             $traits = class_uses($model) ?: [];
 
-            return isset($traits['Illuminate\\Contracts\\Auth\\MustVerifyEmail']) ||
-                   isset($traits['Illuminate\\Foundation\\Auth\\User\\MustVerifyEmail']);
+            return isset($traits['Illuminate\\Auth\\MustVerifyEmail']);
         } catch (Exception) {
             return false;
         }
