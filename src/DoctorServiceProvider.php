@@ -8,6 +8,7 @@ use Laravel\Doctor\Console\DiagnosticMakeCommand;
 use Laravel\Doctor\Console\DoctorCommand;
 use Laravel\Doctor\Diagnostics\ApplicationKeyIsSet;
 use Laravel\Doctor\Diagnostics\ApplicationTimezoneIsValid;
+use Laravel\Doctor\Diagnostics\ApplicationTrustedHostIsConfigured;
 use Laravel\Doctor\Diagnostics\BootstrapCacheMatchesEnvironment;
 use Laravel\Doctor\Diagnostics\CacheStoreIsReachable;
 use Laravel\Doctor\Diagnostics\ComposerAuditPasses;
@@ -74,6 +75,7 @@ class DoctorServiceProvider extends ServiceProvider
                 StorageIsWritable::class,
                 DebugModeMatchesEnvironment::class,
                 EnvironmentFileIsGitIgnored::class,
+                ApplicationTrustedHostIsConfigured::class,
                 ComposerAuditPasses::class,
             ]);
         });
