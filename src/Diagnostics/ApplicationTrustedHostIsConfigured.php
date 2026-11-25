@@ -4,6 +4,7 @@ namespace Laravel\Doctor\Diagnostics;
 
 use Exception;
 use Illuminate\Http\Middleware\TrustHosts;
+use Illuminate\Routing\Middleware\ValidateSignature;
 use Laravel\Doctor\Diagnostic;
 use Laravel\Doctor\EnvironmentMode;
 use Laravel\Doctor\Results\DiagnosticResult;
@@ -83,45 +84,109 @@ class ApplicationTrustedHostIsConfigured extends Diagnostic
     }
 
     /**
-     * Determine if password reset is enabled.
+     * Determine if password reset is enabled by checking for configured password brokers.
      */
     private function usesPasswordReset(): bool
     {
         try {
-            $guard = config('auth.defaults.guard');
-            if (! is_string($guard)) {
+            $brokers = config('auth.passwords');
+
+            if (! is_array($brokers) || empty($brokers)) {
                 return false;
             }
 
-            $provider = config("auth.guards.{$guard}.provider");
+            foreach ($brokers as $broker) {
+                if (is_array($broker) && isset($broker['provider'])) {
+                    $provider = $broker['provider'];
+                    if (is_string($provider) && config("auth.providers.{$provider}") !== null) {
+                        return true;
+                    }
+                }
+            }
 
-            return is_string($provider) && config("auth.providers.{$provider}") !== null;
+            return false;
         } catch (Exception) {
             return false;
         }
     }
 
     /**
-     * Determine if email verification is enabled.
+     * Determine if email verification is enabled by checking User model's MustVerifyEmail trait.
      */
     private function usesEmailVerification(): bool
     {
         try {
             $model = config('auth.providers.users.model');
 
-            return is_string($model) && $model !== '' && class_exists($model);
+            if (! is_string($model) || $model === '' || ! class_exists($model)) {
+                return false;
+            }
+
+            $traits = class_uses($model) ?: [];
+
+            return isset($traits['Illuminate\\Contracts\\Auth\\MustVerifyEmail']) ||
+                   isset($traits['Illuminate\\Foundation\\Auth\\User\\MustVerifyEmail']);
         } catch (Exception) {
             return false;
         }
     }
 
     /**
-     * Determine if temporary signed URLs are used.
+     * Determine if temporary signed URLs are used by inspecting routes.
      */
     private function usesSignedUrls(): bool
     {
-        $value = config('features.signed_urls', false);
+        try {
+            $router = app('router');
+            if (! is_object($router) || ! method_exists($router, 'getRoutes')) {
+                return false;
+            }
 
-        return is_bool($value) ? $value : false;
+            $routes = $router->getRoutes();
+            if (! is_iterable($routes)) {
+                return false;
+            }
+
+            foreach ($routes as $route) {
+                if (! is_object($route) || ! method_exists($route, 'middleware') || ! method_exists($route, 'gatherMiddleware')) {
+                    continue;
+                }
+
+                $middleware = array_merge(
+                    is_array($route->middleware()) ? $route->middleware() : [],
+                    is_array($route->gatherMiddleware()) ? $route->gatherMiddleware() : []
+                );
+
+                foreach ($middleware as $m) {
+                    if ($this->isValidateSignatureMiddleware($m)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        } catch (Exception) {
+            return false;
+        }
+    }
+
+    /**
+     * Check if middleware matches ValidateSignature.
+     */
+    private function isValidateSignatureMiddleware(mixed $middleware): bool
+    {
+        if ($middleware instanceof ValidateSignature) {
+            return true;
+        }
+
+        if (! is_string($middleware) && ! is_object($middleware)) {
+            return false;
+        }
+
+        $middlewareClass = is_string($middleware) ? $middleware : $middleware::class;
+
+        return $middlewareClass === ValidateSignature::class ||
+               $middlewareClass === 'signed' ||
+               str_ends_with((string) $middlewareClass, 'ValidateSignature');
     }
 }
