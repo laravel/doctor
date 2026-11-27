@@ -1,28 +1,31 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Routing\Route;
 use Laravel\Doctor\Diagnostics\ApplicationTrustedHostIsConfigured;
 use Laravel\Doctor\Results\Status;
-use ReflectionClass;
 
-function resetTrustedHosts(): void
+function reenableTrustedHosts(): void
 {
-    $reflection = new ReflectionClass(TrustHosts::class);
-    $property = $reflection->getProperty('alwaysTrust');
-    $property->setAccessible(true);
-    $property->setValue(null);
+    TrustHosts::flushState();
 
-    $subdomains = $reflection->getProperty('subdomains');
-    $subdomains->setAccessible(true);
-    $subdomains->setValue(null);
+    $kernel = app(HttpKernel::class);
+    $kernel->setGlobalMiddleware(array_values(array_filter(
+        $kernel->getGlobalMiddleware(),
+        fn (mixed $middleware): bool => ! (is_string($middleware) && is_a($middleware, TrustHosts::class, true)),
+    )));
 }
 
-function setTrustedHosts(array|callable $hosts, bool $subdomains = true): void
+function enableTrustedHosts(array|callable|null $hosts = null, bool $subdomains = true, string $middleware = TrustHosts::class): void
 {
-    TrustHosts::at($hosts, $subdomains);
+    if (! is_null($hosts)) {
+        TrustHosts::at($hosts, $subdomains);
+    }
+
+    app(HttpKernel::class)->prependMiddleware($middleware);
 }
 
 function addSignedRoute(): void
@@ -34,7 +37,7 @@ function addSignedRoute(): void
 }
 
 beforeEach(function (): void {
-    resetTrustedHosts();
+    reenableTrustedHosts();
 });
 
 it('skips when no security-sensitive features are enabled', function (): void {
@@ -51,7 +54,7 @@ it('skips when no security-sensitive features are enabled', function (): void {
 });
 
 it('passes when trusted host is configured and password reset is enabled', function (): void {
-    setTrustedHosts(['example.com']);
+    enableTrustedHosts(['example.com']);
 
     // Access password broker to trigger binding
     app('auth.password');
@@ -64,7 +67,7 @@ it('passes when trusted host is configured and password reset is enabled', funct
 
 it('warns when trusted host is not configured in local environment with password reset', function (): void {
     $this->app->detectEnvironment(fn (): string => 'local');
-    resetTrustedHosts();
+    reenableTrustedHosts();
 
     app('auth.password');
 
@@ -76,7 +79,7 @@ it('warns when trusted host is not configured in local environment with password
 
 it('fails when trusted host is not configured in production with password reset', function (): void {
     $this->app->detectEnvironment(fn (): string => 'production');
-    resetTrustedHosts();
+    reenableTrustedHosts();
 
     app('auth.password');
 
@@ -88,7 +91,7 @@ it('fails when trusted host is not configured in production with password reset'
 
 it('fails when trusted host is not configured in production with email verification', function (): void {
     $this->app->detectEnvironment(fn (): string => 'production');
-    resetTrustedHosts();
+    reenableTrustedHosts();
     config([
         'auth.providers.users.model' => User::class,
     ]);
@@ -100,7 +103,7 @@ it('fails when trusted host is not configured in production with email verificat
 
 it('fails when trusted host is not configured in production with signed URLs', function (): void {
     $this->app->detectEnvironment(fn (): string => 'production');
-    resetTrustedHosts();
+    reenableTrustedHosts();
 
     addSignedRoute();
 
@@ -110,7 +113,7 @@ it('fails when trusted host is not configured in production with signed URLs', f
 });
 
 it('passes when trusted host is configured as callable', function (): void {
-    setTrustedHosts(fn () => ['example.com', 'another.com']);
+    enableTrustedHosts(fn () => ['example.com', 'another.com']);
 
     app('auth.password');
 
@@ -122,7 +125,7 @@ it('passes when trusted host is configured as callable', function (): void {
 
 it('detects signed middleware in routes', function (): void {
     $this->app->detectEnvironment(fn (): string => 'production');
-    resetTrustedHosts();
+    reenableTrustedHosts();
 
     addSignedRoute();
 
@@ -131,3 +134,49 @@ it('detects signed middleware in routes', function (): void {
     expect($result->status)->toBe(Status::Fail)
         ->and($result->summary)->toContain('must be configured');
 });
+
+it('passes when trust hosts middleware is enabled without explicit hosts', function (): void {
+    config(['app.url' => 'https://example.com']);
+    enableTrustedHosts();
+
+    app('auth.password');
+
+    $result = (new ApplicationTrustedHostIsConfigured)->check();
+
+    expect($result->status)->toBe(Status::Pass);
+});
+
+it('passes when a subclass of trust hosts middleware is registered', function (): void {
+    enableTrustedHosts(['example.com'], middleware: CustomTrustHosts::class);
+
+    app('auth.password');
+
+    $result = (new ApplicationTrustedHostIsConfigured)->check();
+
+    expect($result->status)->toBe(Status::Pass);
+});
+
+it('fails when hosts are set but the middleware is not registered', function (): void {
+    $this->app->detectEnvironment(fn (): string => 'production');
+    TrustHosts::at(['example.com']);
+
+    app('auth.password');
+
+    $result = (new ApplicationTrustedHostIsConfigured)->check();
+
+    expect($result->status)->toBe(Status::Fail);
+});
+
+it('fails when middleware is enabled but no host pattern can be resolved', function (): void {
+    $this->app->detectEnvironment(fn (): string => 'production');
+    config(['app.url' => '']);
+    enableTrustedHosts();
+
+    app('auth.password');
+
+    $result = (new ApplicationTrustedHostIsConfigured)->check();
+
+    expect($result->status)->toBe(Status::Fail);
+});
+
+class CustomTrustHosts extends TrustHosts {}

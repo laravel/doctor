@@ -3,6 +3,7 @@
 namespace Laravel\Doctor\Diagnostics;
 
 use Exception;
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Routing\Middleware\ValidateSignature;
 use Laravel\Doctor\Diagnostic;
@@ -10,7 +11,6 @@ use Laravel\Doctor\EnvironmentMode;
 use Laravel\Doctor\Results\DiagnosticResult;
 use Laravel\Doctor\Results\Link;
 use Laravel\Doctor\Results\Message;
-use ReflectionClass;
 
 class ApplicationTrustedHostIsConfigured extends Diagnostic
 {
@@ -61,15 +61,34 @@ class ApplicationTrustedHostIsConfigured extends Diagnostic
 
     /**
      * Determine if trusted host is configured.
+     *
+     * The TrustHosts middleware must be registered in the global middleware
+     * stack and must resolve to at least one usable host pattern.
      */
     private function trustedHostIsConfigured(): bool
     {
         try {
-            $reflection = new ReflectionClass(TrustHosts::class);
-            $property = $reflection->getProperty('alwaysTrust');
-            $property->setAccessible(true);
+            $kernel = app(HttpKernel::class);
 
-            return $property->getValue() !== null;
+            if (! method_exists($kernel, 'getGlobalMiddleware')) {
+                return false;
+            }
+
+            $middleware = $kernel->getGlobalMiddleware();
+
+            if (! is_array($middleware)) {
+                return false;
+            }
+
+            foreach ($middleware as $class) {
+                if (is_string($class) && is_a($class, TrustHosts::class, true)) {
+                    $instance = app($class);
+
+                    return array_filter($instance->hosts()) !== [];
+                }
+            }
+
+            return false;
         } catch (Exception) {
             return false;
         }
