@@ -3,6 +3,7 @@
 namespace Laravel\Doctor\Diagnostics;
 
 use Exception;
+use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Routing\Middleware\ValidateSignature;
@@ -143,7 +144,7 @@ class ApplicationTrustedHostIsConfigured extends Diagnostic
 
             $traits = class_uses($model) ?: [];
 
-            return isset($traits['Illuminate\\Auth\\MustVerifyEmail']);
+            return isset($traits[MustVerifyEmail::class]);
         } catch (Exception) {
             return false;
         }
@@ -156,6 +157,7 @@ class ApplicationTrustedHostIsConfigured extends Diagnostic
     {
         try {
             $router = app('router');
+
             if (! is_object($router) || ! method_exists($router, 'getRoutes')) {
                 return false;
             }
