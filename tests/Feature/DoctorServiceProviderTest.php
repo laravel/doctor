@@ -5,6 +5,7 @@ use Illuminate\Contracts\Console\Kernel;
 use Laravel\Doctor\Console\DoctorCommand;
 use Laravel\Doctor\Diagnostics\ApplicationKeyIsSet;
 use Laravel\Doctor\Diagnostics\ApplicationTimezoneIsValid;
+use Laravel\Doctor\Diagnostics\ApplicationTrustedHostIsConfigured;
 use Laravel\Doctor\Diagnostics\BootstrapCacheMatchesEnvironment;
 use Laravel\Doctor\Diagnostics\CacheStoreIsReachable;
 use Laravel\Doctor\Diagnostics\ComposerAuditPasses;
@@ -930,6 +931,7 @@ it('binds the doctor service and facade', function (): void {
             StorageIsWritable::class,
             DebugModeMatchesEnvironment::class,
             EnvironmentFileIsGitIgnored::class,
+            ApplicationTrustedHostIsConfigured::class,
             ComposerAuditPasses::class,
             PassingDiagnostic::class,
         ]);
@@ -964,6 +966,7 @@ it('registers the default diagnostics', function (): void {
             StorageIsWritable::class,
             DebugModeMatchesEnvironment::class,
             EnvironmentFileIsGitIgnored::class,
+            ApplicationTrustedHostIsConfigured::class,
             ComposerAuditPasses::class,
         ]);
 });
